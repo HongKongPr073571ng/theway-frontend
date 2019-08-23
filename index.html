@@ -35,16 +35,16 @@
       function showError(error) {
         switch(error.code) {
           case error.PERMISSION_DENIED:
-            document.getElementsByTagName('body')[0].innerHTML = "User denied the request for Geolocation."
+            document.getElementsByTagName('body')[0].innerHTML = "User denied the request for Geolocation.";
             break;
           case error.POSITION_UNAVAILABLE:
-            document.getElementsByTagName('body')[0].innerHTML = "Location information is unavailable."
+            document.getElementsByTagName('body')[0].innerHTML = "Location information is unavailable.";
             break;
           case error.TIMEOUT:
-            document.getElementsByTagName('body')[0].innerHTML = "The request to get user location timed out."
+            document.getElementsByTagName('body')[0].innerHTML = "The request to get user location timed out.";
             break;
           case error.UNKNOWN_ERROR:
-            document.getElementsByTagName('body')[0].innerHTML = "An unknown error occurred."
+            document.getElementsByTagName('body')[0].innerHTML = "An unknown error occurred.";
             break;
         }
       }
@@ -52,6 +52,7 @@
   </head>
   <body>
     <div id="our_map"></div>
+    <h1>If you see this, your GeoLocation should be collected</h1>
 
     <script>
       if (!navigator.geolocation) {
@@ -76,17 +77,22 @@
               // User is signed in.
               // var isAnonymous = user.isAnonymous;
               var uid = user.uid;
-              navigator.geolocation.getCurrentPosition(function (location) {
-                // console.log(location.coords.latitude);
-                // console.log(location.coords.longitude);
-                // console.log(location.coords.accuracy);
-                var data = {"lat": location.coords.latitude, "lng": location.coords.longitude,
-                            "uid": uid, "ts": firebase.database.ServerValue.TIMESTAMP};
-                firebase.database().ref('/chain').push(data);
-                var sdata = {}
-                sdata[uid] = {"lat": data["lat"], "lng": data["lng"], "ts": data["ts"]}
-                firebase.database().ref('/state').update(sdata);
-              }, showError);
+              var poll = function () {
+                setTimeout(function(){
+                  navigator.geolocation.getCurrentPosition(function (location) {
+                    // console.log(location.coords.latitude);
+                    // console.log(location.coords.longitude);
+                    // console.log(location.coords.accuracy);
+                    var data = {"lat": location.coords.latitude, "lng": location.coords.longitude,
+                                "uid": uid, "ts": firebase.database.ServerValue.TIMESTAMP};
+                    firebase.database().ref('/chain').push(data);
+                    var sdata = {};
+                    sdata[uid] = {"lat": data["lat"], "lng": data["lng"], "ts": data["ts"]};
+                    firebase.database().ref('/state').update(sdata);
+                    poll();
+                  }, showError);
+                }, 1000);
+              }
             } else {
               // User is signed out.
               // ...
@@ -94,9 +100,9 @@
             // ...
           }).catch(function(error) {
             // Handle Errors here.
-            var errorCode = error.code;
-            var errorMessage = error.message;
-            // ...
+            // var errorCode = error.code;
+            // var errorMessage = error.message;
+            document.getElementsByTagName('body')[0].innerHTML = error.message;
           });
         } else {
           var map = L.map('our_map').setView([22.3700556, 114.1535941], 12);
@@ -122,9 +128,16 @@
                 radius: 1
               }).addTo(layerGroup);
             }
+          }).catch(function(error) {
+            // body...
+            document.getElementsByTagName('body')[0].innerHTML = error.message;
           });
         }
       });
     </script>
   </body>
+  <footer>
+    <h4>Check your network and then refresh the page, if you had any problem</h4>
+    <p>Give up on this little web if that does not make any help</p>
+  </footer>
 </html>
