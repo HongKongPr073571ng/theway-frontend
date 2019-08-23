@@ -71,6 +71,8 @@
         // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
 
         if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+          document.getElementById('our_map').style.width = 0;
+          document.getElementById('our_map').style.height = 0;
           // get and store geolocation
           firebase.auth().signInAnonymously().onAuthStateChanged(function(user) {
             if (user) {
