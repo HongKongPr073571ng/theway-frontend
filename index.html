@@ -32,14 +32,6 @@
       }
     </style>
     <script type="text/javascript">
-      function postPosition(location) {
-        // console.log(location.coords.latitude);
-        // console.log(location.coords.longitude);
-        // console.log(location.coords.accuracy);
-        var data = JSON.stringify({"user": "hey@mail.com", "token": "101010", "lat": location.coords.latitude, "lng": location.coords.longitude});
-        xhr.send(data);
-      }
-
       function showError(error) {
         switch(error.code) {
           case error.PERMISSION_DENIED:
@@ -62,6 +54,10 @@
     <div id="our_map"></div>
 
     <script>
+      if (!navigator.geolocation) {
+        document.getElementsByTagName('body')[0].innerHTML = "Geolocation is not supported by this browser.";
+        exit();
+      }
       document.addEventListener('DOMContentLoaded', function() {
         // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
         // // The Firebase SDK is initialized and available here!
@@ -73,23 +69,24 @@
         //
         // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
 
-        try {
-          let app = firebase.app();
-          // let features = ['auth', 'database'].filter(feature => typeof app[feature] === 'function');
-          // document.getElementById('load').innerHTML = `Firebase SDK loaded with ${features.join(', ')}`;
-        } catch (e) {
-          console.error(e);
-          // document.getElementById('load').innerHTML = 'Error loading the Firebase SDK, check the console.';
-        }
-
         if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
           // get and store geolocation
           firebase.auth().signInAnonymously().onAuthStateChanged(function(user) {
             if (user) {
               // User is signed in.
-              var isAnonymous = user.isAnonymous;
+              // var isAnonymous = user.isAnonymous;
               var uid = user.uid;
-              // ...
+              navigator.geolocation.getCurrentPosition(function (location) {
+                // console.log(location.coords.latitude);
+                // console.log(location.coords.longitude);
+                // console.log(location.coords.accuracy);
+                var data = {"lat": location.coords.latitude, "lng": location.coords.longitude,
+                            "uid": uid, "ts": firebase.database.ServerValue.TIMESTAMP};
+                firebase.database().ref('/chain').push(data);
+                var sdata = {}
+                sdata[uid] = {"lat": data["lat"], "lng": data["lng"], "ts": data["ts"]}
+                firebase.database().ref('/state').update(sdata);
+              }, showError);
             } else {
               // User is signed out.
               // ...
@@ -101,26 +98,6 @@
             var errorMessage = error.message;
             // ...
           });
-
-          // var xhr = new XMLHttpRequest();
-          // var url = "url";
-          // xhr.open("POST", url, true);
-          // xhr.setRequestHeader("Content-Type", "application/json");
-          // xhr.onreadystatechange = function () {
-          //     if (xhr.readyState === 4 && xhr.status === 200) {
-          //         var json = JSON.parse(xhr.responseText);
-          //         console.log(json.email + ", " + json.password);
-          //     }
-          // };
-          // if (navigator.geolocation) {
-          //   (function () {
-          //       setTimeout(function() {
-          //       navigator.geolocation.getCurrentPosition(postPosition, showError);
-          //     }, 1000);
-          //   })();
-          // } else {
-          //   document.getElementsByTagName('body')[0].innerHTML = "Geolocation is not supported by this browser.";
-          // }
         } else {
           var map = L.map('our_map').setView([22.3700556, 114.1535941], 12);
 
