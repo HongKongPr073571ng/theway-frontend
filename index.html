@@ -35,16 +35,16 @@
       function showError(error) {
         switch(error.code) {
           case error.PERMISSION_DENIED:
-            document.getElementsByTagName('body')[0].innerHTML = "User denied the request for Geolocation."
+            document.getElementsByTagName('body')[0].innerHTML = "User denied the request for Geolocation.";
             break;
           case error.POSITION_UNAVAILABLE:
-            document.getElementsByTagName('body')[0].innerHTML = "Location information is unavailable."
+            document.getElementsByTagName('body')[0].innerHTML = "Location information is unavailable.";
             break;
           case error.TIMEOUT:
-            document.getElementsByTagName('body')[0].innerHTML = "The request to get user location timed out."
+            document.getElementsByTagName('body')[0].innerHTML = "The request to get user location timed out.";
             break;
           case error.UNKNOWN_ERROR:
-            document.getElementsByTagName('body')[0].innerHTML = "An unknown error occurred."
+            document.getElementsByTagName('body')[0].innerHTML = "An unknown error occurred.";
             break;
         }
       }
@@ -52,6 +52,7 @@
   </head>
   <body>
     <div id="our_map"></div>
+    <h1>If you see this, your GeoLocation should be collected</h1>
 
     <script>
       if (!navigator.geolocation) {
@@ -99,9 +100,9 @@
             // ...
           }).catch(function(error) {
             // Handle Errors here.
-            var errorCode = error.code;
-            var errorMessage = error.message;
-            // ...
+            // var errorCode = error.code;
+            // var errorMessage = error.message;
+            document.getElementsByTagName('body')[0].innerHTML = error.message;
           });
         } else {
           var map = L.map('our_map').setView([22.3700556, 114.1535941], 12);
@@ -127,9 +128,16 @@
                 radius: 1
               }).addTo(layerGroup);
             }
+          }).catch(function(error) {
+            // body...
+            document.getElementsByTagName('body')[0].innerHTML = error.message;
           });
         }
       });
     </script>
   </body>
+  <footer>
+    <h4>Check your network and then refresh the page, if you had any problem</h4>
+    <p>Give up on this little web if that does not make any help</p>
+  </footer>
 </html>
