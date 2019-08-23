@@ -1,97 +1,134 @@
 <!DOCTYPE html>
 <html>
-<head>
-	<title>The Way</title>
-	<meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+  <head>
     <meta charset="utf-8">
-	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css" integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ=="    crossorigin=""/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>The Way</title>
+
+    <!-- update the version number as needed -->
+    <script defer src="/__/firebase/6.4.1/firebase-app.js"></script>
+    <!-- include only the Firebase features as you need -->
+    <script defer src="/__/firebase/6.4.1/firebase-auth.js"></script>
+    <script defer src="/__/firebase/6.4.1/firebase-database.js"></script>
+    <!-- <script defer src="/__/firebase/6.4.1/firebase-messaging.js"></script> -->
+    <!-- <script defer src="/__/firebase/6.4.1/firebase-storage.js"></script> -->
+    <!-- initialize the SDK after all desired features are loaded -->
+    <script defer src="/__/firebase/init.js"></script>
+
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.5.1/dist/leaflet.css" integrity="sha512-xwE/Az9zrjBIphAcBb3F6JVqxf46+CDLwfLMHloNu6KEQCAWi6HcDUbeOfBIptF7tcCzusKFjFw2yuvEpDL9wQ==" crossorigin=""/>
     <!-- Make sure you put this AFTER Leaflet's CSS -->
-	<script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js" integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og==" 	crossorigin=""></script>
-	<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha256-pasqAKBDmFT4eHoN2ndd6lN370kFiGUFyTiUHWhU7k8=" crossorigin="anonymous"></script>
-	<style type="text/css">
-		/*#our_map { height: 180px; }*/
-	</style>
-</head>
-<body>
-	<div id="our_map"></div>
-	<!-- The core Firebase JS SDK is always required and must be listed first -->
-	<script src="/__/firebase/6.4.1/firebase-app.js"></script>
+    <script src="https://unpkg.com/leaflet@1.5.1/dist/leaflet.js" integrity="sha512-GffPMF3RvMeYyc1LWMHtK8EbPv0iNZ8/oTtHPx9/cc2ILxQ+u905qIwdpULaqDkyBKgOaB57QTMg7ztg8Jm2Og==" crossorigin=""></script>
 
-	<!-- TODO: Add SDKs for Firebase products that you want to use
-	     https://firebase.google.com/docs/web/setup#reserved-urls -->
+    <style media="screen">
+      /*body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
+      #message { background: white; max-width: 360px; margin: 100px auto 16px; padding: 32px 24px; border-radius: 3px; }
+      #message h2 { color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
+      #message h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}
+      #message p { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }
+      #message a { display: block; text-align: center; background: #039be5; text-transform: uppercase; text-decoration: none; color: white; padding: 16px; border-radius: 4px; }
+      #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
+      #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
+      @media (max-width: 600px) {
+        body, #message { margin-top: 0; background: white; box-shadow: none; }
+        body { border-top: 16px solid #ffa100; }
+      }*/
+    </style>
+  </head>
+  <body>
+    <div id="our_map"></div>
 
-	<!-- Initialize Firebase -->
-	<script src="/__/firebase/init.js"></script>
-	<script type="text/javascript">
-		if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
-			var xhr = new XMLHttpRequest();
-			var url = "url";
-			xhr.open("POST", url, true);
-			xhr.setRequestHeader("Content-Type", "application/json");
-			xhr.onreadystatechange = function () {
-			    if (xhr.readyState === 4 && xhr.status === 200) {
-			        var json = JSON.parse(xhr.responseText);
-			        console.log(json.email + ", " + json.password);
-			    }
-			};
-			if (navigator.geolocation) {
-				(function () {
-				    setTimeout(function() {
-						navigator.geolocation.getCurrentPosition(postPosition, showError);
-					}, 1000);
-				})();
-			} else {
-				document.getElementsByTagName('body')[0].innerHTML = "Geolocation is not supported by this browser.";
-			}
-		} else {
-			var map = L.map('map').setView([22.3700556, 114.1535941], 10);
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
+        // // The Firebase SDK is initialized and available here!
+        //
+        // firebase.auth().onAuthStateChanged(user => { });
+        // firebase.database().ref('/path/to/ref').on('value', snapshot => { });
+        // firebase.messaging().requestPermission().then(() => { });
+        // firebase.storage().ref('/path/to/ref').getDownloadURL().then(() => { });
+        //
+        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
 
-			L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-			    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-			}).addTo(map);
+        try {
+          let app = firebase.app();
+          // let features = ['auth', 'database'].filter(feature => typeof app[feature] === 'function');
+          // document.getElementById('load').innerHTML = `Firebase SDK loaded with ${features.join(', ')}`;
+        } catch (e) {
+          console.error(e);
+          // document.getElementById('load').innerHTML = 'Error loading the Firebase SDK, check the console.';
+        }
+      });
+    </script>
+  </body>
+  <script type="text/javascript">
+    if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+      var xhr = new XMLHttpRequest();
+      var url = "url";
+      xhr.open("POST", url, true);
+      xhr.setRequestHeader("Content-Type", "application/json");
+      xhr.onreadystatechange = function () {
+          if (xhr.readyState === 4 && xhr.status === 200) {
+              var json = JSON.parse(xhr.responseText);
+              console.log(json.email + ", " + json.password);
+          }
+      };
+      if (navigator.geolocation) {
+        (function () {
+            setTimeout(function() {
+            navigator.geolocation.getCurrentPosition(postPosition, showError);
+          }, 1000);
+        })();
+      } else {
+        document.getElementsByTagName('body')[0].innerHTML = "Geolocation is not supported by this browser.";
+      }
+    } else {
+      var map = L.map('map').setView([22.3700556, 114.1535941], 10);
 
-			// Polling / Long polling
-			(function poll() {
-			    setTimeout(function() {
-			    	// send data viewport
-			        $.ajax({ url: "server", success: function(data) {
-			            sales.setValue(data.value);
-			            // foreach in data, add its coordinate to map
-			            var circle = L.circle([51.508, -0.11], {
-							color: 'blue',
-							fillColor: '#30f',
-							fillOpacity: 0.5,
-							radius: 1
-						}).addTo(mymap);
-			        }, dataType: "json", complete: poll });
-			    }, 30000);
-			})();
-		}
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+      }).addTo(map);
 
-		function postPosition(location) {
-			// console.log(location.coords.latitude);
-			// console.log(location.coords.longitude);
-			// console.log(location.coords.accuracy);
-			var data = JSON.stringify({"user": "hey@mail.com", "token": "101010", "lat": location.coords.latitude, "lng": location.coords.longitude});
-			xhr.send(data);
-		}
+      // Polling / Long polling
+      (function poll() {
+          setTimeout(function() {
+            // send data viewport
+              $.ajax({ url: "server", success: function(data) {
+                  sales.setValue(data.value);
+                  // foreach in data, add its coordinate to map
+                  var circle = L.circle([51.508, -0.11], {
+              color: 'blue',
+              fillColor: '#30f',
+              fillOpacity: 0.5,
+              radius: 1
+            }).addTo(mymap);
+              }, dataType: "json", complete: poll });
+          }, 30000);
+      })();
+    }
 
-		function showError(error) {
-		  switch(error.code) {
-		    case error.PERMISSION_DENIED:
-		      document.getElementsByTagName('body')[0].innerHTML = "User denied the request for Geolocation."
-		      break;
-		    case error.POSITION_UNAVAILABLE:
-		      document.getElementsByTagName('body')[0].innerHTML = "Location information is unavailable."
-		      break;
-		    case error.TIMEOUT:
-		      document.getElementsByTagName('body')[0].innerHTML = "The request to get user location timed out."
-		      break;
-		    case error.UNKNOWN_ERROR:
-		      document.getElementsByTagName('body')[0].innerHTML = "An unknown error occurred."
-		      break;
-		  }
-		}
-	</script>
-</body>
+    function postPosition(location) {
+      // console.log(location.coords.latitude);
+      // console.log(location.coords.longitude);
+      // console.log(location.coords.accuracy);
+      var data = JSON.stringify({"user": "hey@mail.com", "token": "101010", "lat": location.coords.latitude, "lng": location.coords.longitude});
+      xhr.send(data);
+    }
+
+    function showError(error) {
+      switch(error.code) {
+        case error.PERMISSION_DENIED:
+          document.getElementsByTagName('body')[0].innerHTML = "User denied the request for Geolocation."
+          break;
+        case error.POSITION_UNAVAILABLE:
+          document.getElementsByTagName('body')[0].innerHTML = "Location information is unavailable."
+          break;
+        case error.TIMEOUT:
+          document.getElementsByTagName('body')[0].innerHTML = "The request to get user location timed out."
+          break;
+        case error.UNKNOWN_ERROR:
+          document.getElementsByTagName('body')[0].innerHTML = "An unknown error occurred."
+          break;
+      }
+    }
+  </script>
 </html>
