@@ -10,3 +10,5 @@ Changed to use Firebase SDK as we are running out of time to implement back end
 
 ## backend
 Firebase
+### Auth
+Anonymous authentication
